@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.paint.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="265.0" prefWidth="419.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.Main">
+   <children>
+      <ImageView fitHeight="265.0" fitWidth="424.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="file:files/start.jpg" />
+         </image></ImageView>
+      <Button contentDisplay="CENTER" layoutX="154.0" layoutY="14.0" mnemonicParsing="false" onAction="#handleAction" opacity="0.69" prefHeight="38.0" prefWidth="110.0" text="WELCOME!!!" AnchorPane.topAnchor="14.0">
+         <font>
+            <Font name="Agency FB Bold" size="20.0" />
+         </font>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+         <textFill>
+            <LinearGradient endX="0.1523809523809524" endY="0.9285714285714286" startX="0.06190476190476191">
+               <stops>
+                  <Stop color="BLACK" />
+                  <Stop color="#dd0101" offset="1.0" />
+               </stops>
+            </LinearGradient>
+         </textFill>
+      </Button>
+   </children>
+</AnchorPane>

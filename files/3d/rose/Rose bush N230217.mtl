@@ -1,0 +1,66 @@
+# 3ds Max Wavefront OBJ Exporter v0.94b - (c)2007 guruware
+# File Created: 23.02.2017 09:54:18
+
+newmtl trunk
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 1.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.0000 0.0000 0.0000
+	Kd 0.9804 0.9529 0.7686
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka D:\New folder gsm\trunk11d.jpg
+	map_Kd D:\New folder gsm\trunk11d.jpg
+	map_bump -bm 0.3000 D:\New folder gsm\trunk11d.jpg
+	bump -bm 0.3000 D:\New folder gsm\trunk11d.jpg
+
+newmtl tich
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 1.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.0000 0.0000 0.0000
+	Kd 0.9451 0.7686 0.2314
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka D:\New folder gsm\giallo.jpg
+	map_Kd D:\New folder gsm\giallo.jpg
+	map_bump D:\New folder gsm\giallo.jpg
+	bump D:\New folder gsm\giallo.jpg
+
+newmtl leaf
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 1.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.0000 0.0000 0.0000
+	Kd 0.6392 0.8902 0.5608
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka D:\New folder gsm\leaf12_d.jpg
+	map_Kd D:\New folder gsm\leaf12_d.jpg
+	map_bump -bm 0.3000 D:\New folder gsm\leaf12_d.jpg
+	bump -bm 0.3000 D:\New folder gsm\leaf12_d.jpg
+
+newmtl petal
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 1.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.0000 0.0000 0.0000
+	Kd 0.8902 0.3020 0.1843
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka D:\New folder gsm\flower12.jpg
+	map_Kd D:\New folder gsm\flower12.jpg
+	map_bump -bm 0.3000 D:\New folder gsm\flower12.jpg
+	bump -bm 0.3000 D:\New folder gsm\flower12.jpg
