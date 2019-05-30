@@ -4,11 +4,11 @@ import static space.enumSpaceObjects.EARTH;
 import static space.enumSpaceObjects.SATURN;
 import static space.enumSpaceObjects.getObject;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import apartment.Actor;
+import apartment.Apartment;
 import javafx.application.Application;
 import javafx.scene.Node;
 import javafx.scene.PerspectiveCamera;
@@ -28,13 +28,13 @@ import stuff_on_earth.StuffOnEarth;
 
 public class MainSpace extends Application {
 	public static Node Earth;
+	public static ArrayList<Node> spaceObjects = new ArrayList<Node>();
 	public static StackPane root = new StackPane();
-	private boolean isScaled=false, isSetAtEarth=false;
+	private boolean isScaled = false, isSetAtEarth = false, hasApartment = false, isPpressed = false;
 	private int angleHorizontal;
 	
 	@Override
 	public void start(Stage arg) throws Exception {
-		var spaceObjects = new ArrayList<Node>();
 		for (int i = 0; i < 9; i++) {
 			spaceObjects.add(SpaceObject.create(getObject(i)));
 			new SpaceObject().move(getObject(i), spaceObjects.get(i)).rotate(10_000, spaceObjects.get(i));
@@ -55,13 +55,13 @@ public class MainSpace extends Application {
 		  terra.getTransforms().add(new Rotate(90, Rotate.Z_AXIS));
 		  stuffOnEarth.add(new StuffOnEarth(.18f, terra));
 		  {//trees
-			  for (int i = -40; i < 0; i+=7)                         
+			  for (int i = -40; i < 0; i+=7)                        
 				  stuffOnEarth.add(new StuffOnEarth("tree", "obj", 1.05f, .009f, i, 320-i));
-			  for (int i = 0; i <= 40; i+=7)                           
+			  for (int i = 0; i <= 40; i+=7)                        
 				  stuffOnEarth.add(new StuffOnEarth("tree", "obj", 1.05f, .009f, i, 320+i));
-			  for (int i = -25; i < 0; i+=7)                           
+			  for (int i = -25; i < 0; i+=7)                        
 				  stuffOnEarth.add(new StuffOnEarth("tree", "obj", 1.05f, .009f, i, 350-i));
-			  for (int i = 0; i <= 25; i+=7)                           
+			  for (int i = 0; i <= 25; i+=7)                        
 				  stuffOnEarth.add(new StuffOnEarth("tree", "obj", 1.05f, .009f, i, 350+i));
 		  }
 		  {//flowers
@@ -73,36 +73,28 @@ public class MainSpace extends Application {
 			  }
 		  }
 		  {//animals
-			  var eagle = new StuffOnEarth("eagle", "3ds", 1.16f, .00005f, 30, 0);
+			  var eagle = new StuffOnEarth("eagle", "3ds", 1.16f, .00003f, 30, 50);
 		      for (Node eaglePart : eagle.getShape()) {
 		    	  eaglePart.translateZProperty().bind(eagle.getAura().translateZProperty().subtract(250));
 		    	  eaglePart.getTransforms().add(new Rotate(180+90, Rotate.X_AXIS));
 		      }
 		      stuffOnEarth.add(eagle);
 		      
-		      var lion = new StuffOnEarth("lion", "3ds", 1.15f, .0002f, -15, 40);
+		      var lion = new StuffOnEarth("lion", "3ds", 1.15f, .0001f, -30, 50);
 		      for (Node lionPart : lion.getShape()) 
 		    	  lionPart.getTransforms().add(new Rotate(-90, Rotate.X_AXIS));
 		      stuffOnEarth.add(lion);
-		      
-		      //if improved would be fine
-			  //stuffOnEarth.add(new StuffOnEarth("tucan", "obj", (float) (EARTH.radius*1.06), .01f, 0, 0));
 		  }
-		  {//house
-			  var house = new StuffOnEarth("house", "3ds", 1.155f, .000025f, 0, 70);
+		  //house
+			  var house = new StuffOnEarth("house", "3ds", 1.12f, .000025f, 0,55);
 			  for (var housePart : house.getShape()) 
 				  housePart.getTransforms().add(new Rotate(-90, Rotate.X_AXIS));
 		      stuffOnEarth.add(house);
-		  }
-		  {//people
-			  /*
-			  var man = new StuffOnEarth("0MAN", "3ds", 10, 1, 0, 0);
-			  stuffOnEarth.add(man);
-			 
-			  var woman = new StuffOnEarth("0WOMAN", "3ds", 7, 1, 0, 0);
-			  stuffOnEarth.add(woman);
-			  */
-		  }
+		      
+		      var apartment = Apartment.getApartment();
+		      Apartment.putOnEarth(house);
+		      apartment.setVisible(false); 
+		 
 		  var atmosphere = new Sphere(EARTH.radius*1.3);
 		  var material =  new PhongMaterial();
 		  material.setDiffuseColor(new Color(.6,.8,.9, .5));
@@ -134,9 +126,24 @@ public class MainSpace extends Application {
 		arg.setTitle("WORLD"); 
 		arg.getIcons().add(new Image("file:files/icon.png"));
 		arg.setOnCloseRequest(e-> System.exit(0));
+		arg.show();
 		
 		scene.setOnKeyPressed(e-> {
 			switch (e.getCode()) {
+			case P:
+				if(hasApartment==false) {
+					isPpressed=true;
+					hasApartment = true;
+				    atmosphere.setVisible(false);
+				    for (var part : house.getShape()) part.setVisible(false);
+				    apartment.setVisible(true);
+				    Apartment.setCameraOnApartment(cameraPane, house);
+				    resizeEarthStuff(stuffOnEarth, 100);
+				    Earth.setScaleX(Earth.getScaleX()*100);
+				    Earth.setScaleY(Earth.getScaleY()*100);
+				    Earth.setScaleZ(Earth.getScaleZ()*100);
+				}
+				break;
 			case C://camera
 				if (isScaled==false)
 				if (isSetAtEarth) {
@@ -185,22 +192,45 @@ public class MainSpace extends Application {
 					isScaled = true;
 				}break;
 			//rotation 	
-			case UP:   camera.setTranslateX(camera.getTranslateX()+ Math.sin(Math.toRadians(angleHorizontal))*10);
-			           camera.setTranslateY(camera.getTranslateY()- Math.cos(Math.toRadians(angleHorizontal))*10);
-			           break;                                                                                 
-			case DOWN: camera.setTranslateX(camera.getTranslateX()- Math.sin(Math.toRadians(angleHorizontal))*10);
-			           camera.setTranslateY(camera.getTranslateY()+ Math.cos(Math.toRadians(angleHorizontal))*10);
-			           break;
+			case UP:   
+				if (isPpressed) {
+					Actor.goAhead();
+				} else {
+					camera.setTranslateX(camera.getTranslateX()+ Math.sin(Math.toRadians(angleHorizontal))*10);
+					camera.setTranslateY(camera.getTranslateY()- Math.cos(Math.toRadians(angleHorizontal))*10); 
+				}
+				break;                                                                                     
+			case DOWN: 
+				if (isPpressed) {
+					Actor.goBack();
+				} else {
+					camera.setTranslateX(camera.getTranslateX()- Math.sin(Math.toRadians(angleHorizontal))*10);
+					camera.setTranslateY(camera.getTranslateY()+ Math.cos(Math.toRadians(angleHorizontal))*10);
+				}
+				break;
 			case LEFT: 
-				camera.getTransforms().add(new Rotate(-1, Rotate.Y_AXIS));
-				angleHorizontal--;
+				if (isPpressed) {
+					Actor.goLeft();
+				} else {
+					camera.getTransforms().add(new Rotate(-1, Rotate.Y_AXIS));
+					angleHorizontal--;
+				}
 				break;
 			case RIGHT:
-				camera.getTransforms().add(new Rotate(+1, Rotate.Y_AXIS));
-				angleHorizontal++;
+				if (isPpressed) {
+					Actor.goRight();
+				} else {
+					camera.getTransforms().add(new Rotate(+1, Rotate.Y_AXIS));
+					angleHorizontal++;
+				}
 				break;
-			case EQUALS:     camera.setTranslateZ(camera.getTranslateZ()-10);break;
-			case MINUS: camera.setTranslateZ(camera.getTranslateZ()+10);break;
+			case EQUALS:     
+				camera.setTranslateZ(camera.getTranslateZ()-10);
+				break;
+			case MINUS: 
+				camera.setTranslateZ(camera.getTranslateZ()+10);
+				break;
+			case CONTROL: System.exit(0);
 		    default: System.out.println("Wrong number"+e.getCode());break;
 			}});    
 	}  
@@ -219,5 +249,8 @@ public class MainSpace extends Application {
 			movement.setPath(new Circle(earthObject.distanceFromTheCenterOfPlanet*parameter));
 			movement.playFrom(t);
 		}	
+	}
+	public static void main(String[] args) {
+		launch(args);
 	}
 }
