@@ -10,3 +10,7 @@ There is also an Actress roaming in an apartment and doing different things (lik
 
 Idially, there should work all the laws of physics, biology and chemics, describe the behavior of a human being
 but I did it in a VERY simplified way.
+
+ © Philipp Bonadykov 2019
+For this project I used 3d model downloaded for free (from the resources like sweethome and other websites recomended there).
+If you want to use part of my code for some purposes feel free to do it but let me know, please.
