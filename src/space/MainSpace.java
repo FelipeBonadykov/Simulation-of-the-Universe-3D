@@ -20,9 +20,12 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.paint.PhongMaterial;
+import javafx.scene.shape.Box;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
+import javafx.scene.transform.Scale;
+import javafx.scene.transform.Translate;
 import javafx.stage.Stage;
 import stuff_on_earth.StuffOnEarth;
 
@@ -30,14 +33,15 @@ public class MainSpace extends Application {
 	public static Node Earth;
 	public static ArrayList<Node> spaceObjects = new ArrayList<Node>();
 	public static StackPane root = new StackPane();
-	private boolean isScaled = false, isSetAtEarth = false, hasApartment = false, isPpressed = false;
+	private boolean isScaled = false, isSetAtEarth = false, isPpressed = false;
 	private int angleHorizontal;
 	
 	@Override
 	public void start(Stage arg) throws Exception {
+		//space objects
 		for (int i = 0; i < 9; i++) {
 			spaceObjects.add(SpaceObject.create(getObject(i)));
-			new SpaceObject().move(getObject(i), spaceObjects.get(i)).rotate(10_000, spaceObjects.get(i));
+			new SpaceObject().move(getObject(i), spaceObjects.get(i)).rotate(360_00, spaceObjects.get(i));
 		}
 		var rings = new Circle(15.3);
 		rings.setFill(new ImagePattern(new Image("file:files/textures/saturn rings with shadow.png")));
@@ -47,54 +51,46 @@ public class MainSpace extends Application {
 	    root.getChildren().addAll(spaceObjects);
 		   
 		Earth = spaceObjects.get(EARTH.number);
-			
+		
+		//objects on the Erath
 		var stuffOnEarth = new ArrayList<StuffOnEarth>();
 		
-		  var terra = new Sphere(.9*EARTH.radius);
-		  terra.setMaterial(new PhongMaterial(Color.WHITE,new Image("file:files/textures/Earth/grass.jpg"),null,null,null));
-		  terra.getTransforms().add(new Rotate(90, Rotate.Z_AXIS));
-		  stuffOnEarth.add(new StuffOnEarth(.18f, terra));
-		  {//trees
-			  for (int i = -40; i < 0; i+=7)                        
-				  stuffOnEarth.add(new StuffOnEarth("tree", "obj", 1.05f, .009f, i, 320-i));
-			  for (int i = 0; i <= 40; i+=7)                        
-				  stuffOnEarth.add(new StuffOnEarth("tree", "obj", 1.05f, .009f, i, 320+i));
-			  for (int i = -25; i < 0; i+=7)                        
-				  stuffOnEarth.add(new StuffOnEarth("tree", "obj", 1.05f, .009f, i, 350-i));
-			  for (int i = 0; i <= 25; i+=7)                        
-				  stuffOnEarth.add(new StuffOnEarth("tree", "obj", 1.05f, .009f, i, 350+i));
-		  }
-		  {//flowers
-			  int minJ=-10, maxJ=10;
-			  for (int i = 20; i >= 10; i=i-5) {
-				  for (int j = minJ; j <= maxJ; j+=5)
-					  stuffOnEarth.add(new StuffOnEarth("rose", "obj", 1.07f, .002f, j, i));
-			      minJ+=5;maxJ-=5;
-			  }
-		  }
-		  {//animals
-			  var eagle = new StuffOnEarth("eagle", "3ds", 1.16f, .00003f, 30, 50);
-		      for (Node eaglePart : eagle.getShape()) {
-		    	  eaglePart.translateZProperty().bind(eagle.getAura().translateZProperty().subtract(250));
-		    	  eaglePart.getTransforms().add(new Rotate(180+90, Rotate.X_AXIS));
-		      }
-		      stuffOnEarth.add(eagle);
-		      
-		      var lion = new StuffOnEarth("lion", "3ds", 1.15f, .0001f, -30, 50);
-		      for (Node lionPart : lion.getShape()) 
-		    	  lionPart.getTransforms().add(new Rotate(-90, Rotate.X_AXIS));
-		      stuffOnEarth.add(lion);
-		  }
+		  //trees
+		  for (int i = -40; i < 0; i+=7)                        
+	    	  stuffOnEarth.add(new StuffOnEarth("tree", "obj", .95f, .009f, i, 320-i));
+	      for (int i = 0; i <= 40; i+=7)                        
+	    	  stuffOnEarth.add(new StuffOnEarth("tree", "obj", .95f, .009f, i, 320+i));
+	      for (int i = -25; i < 0; i+=7)                        
+	    	  stuffOnEarth.add(new StuffOnEarth("tree", "obj", .95f, .009f, i, 350-i));
+	      for (int i = 0; i <= 25; i+=7)                        
+	    	  stuffOnEarth.add(new StuffOnEarth("tree", "obj", .95f, .009f, i, 350+i));
+		  //flowers
+	      int minJ=-10, maxJ=10;
+	      for (int i = 20; i >= 10; i=i-5) {
+	        for (int j = minJ; j <= maxJ; j+=5)
+	      	  stuffOnEarth.add(new StuffOnEarth("rose", "obj", .95f, .002f, j, i));
+	          minJ+=5;maxJ-=5;
+	      }
+		  //animal
+		  var lion = new StuffOnEarth("lion", "3ds", 1.15f, .0001f, -30, 50);
+		  stuffOnEarth.add(lion);
 		  //house
-			  var house = new StuffOnEarth("house", "3ds", 1.12f, .000025f, 0,55);
-			  for (var housePart : house.getShape()) 
-				  housePart.getTransforms().add(new Rotate(-90, Rotate.X_AXIS));
-		      stuffOnEarth.add(house);
+		  var houseMesh = new Box(.25, .25, .35);
+		  houseMesh.setMaterial(new PhongMaterial(Color.BROWN));
+		  var house = new StuffOnEarth(1, 70, houseMesh);
+		  stuffOnEarth.add(house);
+		  
+		  var apartment = new StuffOnEarth(1.01f, 80, Apartment.getApartment());
+		  apartment.getShape().getTransforms().addAll
+		      (new Rotate(90, Rotate.Y_AXIS), new Rotate(-90, Rotate.X_AXIS), new Scale(.001, .001, .001));
+		  apartment.getShape().setVisible(false); 
+		  stuffOnEarth.add(apartment);
+		  
+		  var water = new Sphere(1.05*EARTH.radius);
+	      water.setMaterial(new PhongMaterial(Color.WHITE, new Image("file:files/textures/Earth/ocean.gif"),null,null,null));
+		  water.getTransforms().add(new Rotate(90, Rotate.Z_AXIS));
+		  stuffOnEarth.add(new StuffOnEarth(.08f, 235, water));
 		      
-		      var apartment = Apartment.getApartment();
-		      Apartment.putOnEarth(house);
-		      apartment.setVisible(false); 
-		 
 		  var atmosphere = new Sphere(EARTH.radius*1.3);
 		  var material =  new PhongMaterial();
 		  material.setDiffuseColor(new Color(.6,.8,.9, .5));
@@ -102,17 +98,15 @@ public class MainSpace extends Application {
 		  material.setSelfIlluminationMap(new Image("file:files/textures/Earth/clouds.png"));
 		  atmosphere.getTransforms().add(new Rotate(90, Rotate.Y_AXIS));
 		  atmosphere.setMaterial(material);
-		  stuffOnEarth.add(new StuffOnEarth(.01f, atmosphere));
+		  stuffOnEarth.add(new StuffOnEarth(0.01f, 0, atmosphere));
 		  
 		  var moon = new Sphere(EARTH.radius/4);
 		  moon.setMaterial(new PhongMaterial(Color.WHITE,new Image("file:files/textures/Earth/moon.jpg"),null,null,null));
-		  stuffOnEarth.add(new StuffOnEarth(10, moon));
+		  stuffOnEarth.add(new StuffOnEarth(10, 0, moon));
 		  
 		var camera = new PerspectiveCamera(false);
-		camera.getTransforms().add(new Rotate(90, Rotate.X_AXIS));
-		camera.setTranslateX(-625); 
-		camera.setTranslateY(700);
-		camera.setTranslateZ(-380);
+		camera.getTransforms().addAll
+		(new Rotate(90, Rotate.X_AXIS), new Translate(-625, -400, -400));
 		var cameraPane = new StackPane();
 		cameraPane.getChildren().add(camera);
 				   
@@ -131,17 +125,14 @@ public class MainSpace extends Application {
 		scene.setOnKeyPressed(e-> {
 			switch (e.getCode()) {
 			case P:
-				if(hasApartment==false) {
-					isPpressed=true;
-					hasApartment = true;
+				if(isScaled==false & isSetAtEarth==false & isPpressed==false) {
 				    atmosphere.setVisible(false);
-				    for (var part : house.getShape()) part.setVisible(false);
-				    apartment.setVisible(true);
-				    Apartment.setCameraOnApartment(cameraPane, house);
-				    resizeEarthStuff(stuffOnEarth, 100);
-				    Earth.setScaleX(Earth.getScaleX()*100);
-				    Earth.setScaleY(Earth.getScaleY()*100);
-				    Earth.setScaleZ(Earth.getScaleZ()*100);
+				    house.getShape().setVisible(false);
+				    apartment.getShape().setVisible(true);
+				    new StuffOnEarth(apartment, cameraPane);
+    			    resizeEarthStuff(stuffOnEarth, 100, true);
+				    Earth.getTransforms().add(new Scale(100, 100, 100));
+				    isPpressed=true;
 				}
 				break;
 			case C://camera
@@ -152,43 +143,38 @@ public class MainSpace extends Application {
 					cameraPane.translateYProperty().bind(spaceObjects.get(0).translateYProperty());
 					cameraPane.translateZProperty().bind(spaceObjects.get(0).translateZProperty());
 					//resize
-						resizeEarthStuff(stuffOnEarth, .125*.25);
-						Earth.setScaleX(Earth.getScaleX()*.125*.25);
-						Earth.setScaleY(Earth.getScaleY()*.125*.25);
-						Earth.setScaleZ(Earth.getScaleZ()*.125*.25);
+					resizeEarthStuff(stuffOnEarth, 1/32, false);
+					for (int i = 0; i < stuffOnEarth.size()-4; i++)
+						stuffOnEarth.get(i).getShape().getTransforms().remove
+						(stuffOnEarth.get(i).getShape().getTransforms().size()-1);
+					Earth.getTransforms().remove(Earth.getTransforms().size()-1);
 				} else {
 					isSetAtEarth=true;
 					cameraPane.translateXProperty().bind(Earth.translateXProperty());
 					cameraPane.translateYProperty().bind(Earth.translateYProperty());
 					cameraPane.translateZProperty().bind(Earth.translateZProperty());
-					
-					camera.setTranslateX(Earth.getTranslateX()-1100); 
-					camera.setTranslateY(Earth.getTranslateY()-300);
-					camera.setTranslateZ(Earth.getTranslateZ()-300);
 					//resize
-						resizeEarthStuff(stuffOnEarth, 32);
-						Earth.setScaleX(Earth.getScaleX()*32);
-						Earth.setScaleY(Earth.getScaleY()*32);
-						Earth.setScaleZ(Earth.getScaleZ()*32);
+					resizeEarthStuff(stuffOnEarth, 32, true);
+					for (int i = 0; i < stuffOnEarth.size()-4; i++)
+						stuffOnEarth.get(i).getShape().getTransforms().add(new Scale(.8,.8,.8));
+					Earth.getTransforms().add(new Scale(33,33,33));
 				}
 				break;
 			case S://scale
 				if (isSetAtEarth==false)
 				if (isScaled) {
-					resizeEarthStuff(stuffOnEarth, .125);
-					for (Node planet : spaceObjects) {
-						planet.setScaleX(planet.getScaleX()/8);
-						planet.setScaleY(planet.getScaleY()/8);
-						planet.setScaleZ(planet.getScaleZ()/8);
-					}
+					resizeEarthStuff(stuffOnEarth, 1/8, false);
+					for (int i = 0; i < stuffOnEarth.size()-4; i++)
+						stuffOnEarth.get(i).getShape().setVisible(true);
+					for (var planet : spaceObjects) 
+						planet.getTransforms().remove(planet.getTransforms().size()-1);
 					isScaled=false;
 				} else {
-					resizeEarthStuff(stuffOnEarth, 8);
-					for (Node planet : spaceObjects) {
-						planet.setScaleX(planet.getScaleX()*8);
-					    planet.setScaleY(planet.getScaleY()*8);
-					    planet.setScaleZ(planet.getScaleZ()*8);
-					}
+					resizeEarthStuff(stuffOnEarth, 8, true);
+					for (int i = 0; i < stuffOnEarth.size()-4; i++)
+						stuffOnEarth.get(i).getShape().setVisible(false);
+					for (var planet : spaceObjects) 
+						planet.getTransforms().add(new Scale(8, 8, 8));
 					isScaled = true;
 				}break;
 			//rotation 	
@@ -232,16 +218,16 @@ public class MainSpace extends Application {
 				break;
 			case CONTROL: System.exit(0);
 		    default: System.out.println("Wrong number"+e.getCode());break;
-			}});    
-	}  
-	private void resizeEarthStuff(List<StuffOnEarth> listOfObjects, double parameter) {
+			}});
+	}
+	private void resizeEarthStuff(List<StuffOnEarth> listOfObjects, double parameter, boolean enlarge) {
 		for (var earthObject : listOfObjects) {
-			for (var part : earthObject.getShape()) {
-				part.setScaleX(part.getScaleX()*parameter);
-                part.setScaleY(part.getScaleY()*parameter);
-				part.setScaleZ(part.getScaleZ()*parameter);
-			}
-			earthObject.getAuraPane().translateZProperty().bind(Earth.translateZProperty().add(parameter*earthObject.angle));
+			if (enlarge)
+				earthObject.getShape().getTransforms().add(new Scale(parameter,parameter,parameter));
+			 else 
+				earthObject.getShape().getTransforms().remove(earthObject.getShape().getTransforms().size()-1);
+			earthObject.getAuraPane().translateZProperty().
+			bind(Earth.translateZProperty().add(parameter*earthObject.upsfift));
 		
 			var movement = earthObject.getMovement();
 			var t = movement.getCurrentTime();

@@ -10,6 +10,7 @@ import com.interactivemesh.jfx.importer.tds.TdsModelImporter;
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
 import javafx.animation.PathTransition;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import javafx.scene.media.Media;
@@ -23,7 +24,7 @@ import javafx.scene.transform.Translate;
 import javafx.util.Duration;
 
 public class Actress {
-	private static Node[] girl;
+	private static Group girl;
 	private static Box aura = new Box(30,30, 100);
 	private static Pane girlPane = new Pane();
 	private static PathTransition moves = new PathTransition();
@@ -39,23 +40,18 @@ public class Actress {
 	public static Pane getActress() {
 		return girlPane;
 	}
-	private static Node[] createActress() {
+	private static Group createActress() {
 		ModelImporter modelImporter = new TdsModelImporter();
 	    String direction = "files/apartment/3d models/0 PEOPLE/girl/girl.3ds";
-	    Node[] mesh=null;
+	    Group mesh=null;
 	    try {
 	    	modelImporter.read(direction);//directory of object in relation to the project
-	    	mesh = (Node[]) modelImporter.getImport();
+	    	mesh = new Group((Node[]) modelImporter.getImport());
 	    	modelImporter.close();
 	    } catch (Exception e) {
 	    	System.err.println(e.getCause() +"  "+ e.getMessage());
 	    }
-	    var scale = new Scale();	
-	    scale.setX(1.7);
-        scale.setY(1.7);	
-        scale.setZ(1.7);	
-        for (var part : mesh) 
-        	part.getTransforms().addAll(new Rotate(90, Rotate.X_AXIS), scale);
+        mesh.getTransforms().addAll(new Rotate(90, Rotate.X_AXIS), new Scale(1.7,1.7,1.7));
 	    return mesh;
 	}
 	//artificial intelligence
@@ -123,13 +119,13 @@ public class Actress {
 	private static void eat() {
 		canGo=false;
 		moves.pause();
-		Apartment.actionstuff.get(3)[0].setVisible(true);
+		Apartment.actionstuff.get(3).setVisible(true);
 		new MediaPlayer(new Media(new File("files/apartment/sounds/eating.wav").toURI().toString())).play();
 		new Timer().schedule(new TimerTask() {
 			@Override
 			public void run() {
 				canGo=true;
-				Apartment.actionstuff.get(3)[0].setVisible(false);
+				Apartment.actionstuff.get(3).setVisible(false);
 				moves.play();
 				setAngleRotate(-90);
 			}
@@ -138,13 +134,13 @@ public class Actress {
 	private static void watchTV() {
 		canGo=false;
 		moves.pause();
-		Apartment.actionstuff.get(1)[0].setVisible(true);
+		Apartment.actionstuff.get(1).setVisible(true);
 		new MediaPlayer(new Media(new File("files/apartment/sounds/relaxing.wav").toURI().toString())).play();
 		new Timer().schedule(new TimerTask() {
 			@Override
 			public void run() {
 				canGo=true;
-				Apartment.actionstuff.get(1)[0].setVisible(false);
+				Apartment.actionstuff.get(1).setVisible(false);
 				moves.play();
 			}
 		}, 7*1000L);
@@ -165,19 +161,19 @@ public class Actress {
 	private static void takeShower() {
 		canGo=false;
 		moves.pause();
-		girl[0].setVisible(false);
-		girl[1].setVisible(false);
-		girl[2].setVisible(false);
-		girl[4].setVisible(false);
+		girl.getChildren().get(0).setVisible(false);
+		girl.getChildren().get(1).setVisible(false);
+		girl.getChildren().get(2).setVisible(false);
+		girl.getChildren().get(4).setVisible(false);
 		new MediaPlayer(new Media(new File("files/apartment/sounds/taking-shower.wav").toURI().toString())).play();
 		new Timer().schedule(new TimerTask() {
 			@Override
 			public void run() {
 				canGo=true;
-				girl[0].setVisible(true);
-				girl[1].setVisible(true);
-				girl[2].setVisible(true);
-				girl[4].setVisible(true);
+				girl.getChildren().get(0).setVisible(true);
+				girl.getChildren().get(1).setVisible(true);
+				girl.getChildren().get(2).setVisible(true);
+				girl.getChildren().get(4).setVisible(true);
 				moves.playFrom(new Duration(27000));
 			}
 		}, 3*1000L);

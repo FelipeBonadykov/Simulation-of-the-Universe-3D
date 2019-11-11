@@ -6,7 +6,7 @@ import javafx.scene.paint.PhongMaterial;
 
 public enum enumSpaceObjects { 
 	SUN    (0,  25,1/65,     null , null, null,"sun", Color.WHITE),
-	MERCURY(1, .40,   2,  "merury", null, null, null, Color.WHITE),
+	MERCURY(1, .40,   2,  "mercury", null, null, null, Color.WHITE),
 	VENUS  (2, .90,   4,   "venus", null, null, null, Color.WHITE),
 	EARTH  (3,   1,   7,   "earth", null, null, null, Color.WHITE),
 	MARS   (4,  .5,  10,    "mars", null, null, null, Color.WHITE),
@@ -26,7 +26,7 @@ public enum enumSpaceObjects {
 		this.angleYear = (9-number)*.001;
 		material = new PhongMaterial(
 				color, 
-				number!=3? new Image("file:files/textures/"+map+".jpg") : new Image(("file:files/textures/Earth/ocean.gif")),
+				number!=3? new Image("file:files/textures/"+map+".jpg") : new Image(("file:files/textures/Earth/grass.jpg")),
 				specular!=null ? new Image("file:files/textures/"+specular+".jpg") : null,   
 				surface!=null ? new Image("file:files/textures/"+surface+".jpg") : null,     
 				illuminate!=null ? new Image("file:files/textures/"+illuminate+".jpg") : null

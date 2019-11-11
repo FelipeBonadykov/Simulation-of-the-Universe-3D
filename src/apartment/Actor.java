@@ -9,6 +9,7 @@ import com.interactivemesh.jfx.importer.obj.ObjModelImporter;
 
 import javafx.animation.Interpolator;
 import javafx.animation.TranslateTransition;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -19,84 +20,71 @@ import javafx.scene.transform.Translate;
 import javafx.util.Duration;
 
 public class Actor {
-	private static Node[] Actor = createActor("man");
+	private static Group Actor = createActor("man");
 	private static boolean canGo=true;
 	private static Box aura = new Box(30,30, 100);
 	static {
-		 aura.translateXProperty().bind(Actor[2].translateXProperty());
-		 aura.translateYProperty().bind(Actor[2].translateYProperty());
+		 aura.translateXProperty().bind(Actor.translateXProperty());
+		 aura.translateYProperty().bind(Actor.translateYProperty());
 	 }
-	private static Node[] createActor(String person) {
+	private static Group createActor(String person) {
 		ModelImporter modelImporter = new ObjModelImporter();
-		Node[] mesh=null;
+		Group mesh=null;
 		try {
 			modelImporter.read("files/apartment/3d models/0 PEOPLE/"+person+"/"+person+".obj");
-			mesh = (Node[]) modelImporter.getImport();
+			mesh = new Group((Node[]) modelImporter.getImport());
 			modelImporter.close();
 		} catch (Exception e) {
 			System.err.println(" FILE NOT FOUND  "+e.getMessage());
 		}
-		var scale = new Scale();	
-		scale.setX(.6);
-	    scale.setY(.6);	
-	    scale.setZ(.6);
-	    for (var part : mesh) {
-	    	part.getTransforms().addAll(new Rotate(90, Rotate.X_AXIS), scale, new Rotate(180, Rotate.Y_AXIS), new Rotate());
-		    part.setTranslateX(-30);
-		}
+	    mesh.getTransforms().addAll
+	    (new Rotate(90, Rotate.X_AXIS), new Scale(.6,.6,.6), new Rotate(180, Rotate.Y_AXIS), new Rotate());
+		mesh.setTranslateX(-30);
 		return mesh;
 	}
 	
-	public static Node[] getActor() {
+	public static Group getActor() {
 		return Actor;
 	}
 	//movements
 	public static void goAhead(){
 		if (NotCollides(0, -10)&canGo) 
-		for (var part : Actor) {
-			part.getTransforms().remove(part.getTransforms().size()-1);
-			part.getTransforms().add(new Rotate(0, Rotate.Y_AXIS));
-
-			var go = new TranslateTransition(new Duration(100), part);
-			go.setByY(-10);
-			go.setInterpolator(Interpolator.LINEAR);
-			go.play();
-		}
+	    Actor.getTransforms().remove(Actor.getTransforms().size()-1);
+	    Actor.getTransforms().add(new Rotate(0, Rotate.Y_AXIS));
+        
+	    var go = new TranslateTransition(new Duration(100), Actor);
+	    go.setByY(-10);
+	    go.setInterpolator(Interpolator.LINEAR);
+	    go.play();
 	}
 	public static void goBack (){
 		if (NotCollides(0, 10)&canGo) 
-		for (var part : Actor){
-			part.getTransforms().remove(part.getTransforms().size()-1);
-			part.getTransforms().add(new Rotate(180, Rotate.Y_AXIS));
-			
-			var go = new TranslateTransition(new Duration(100), part);
-			go.setByY(10);
-			go.setInterpolator(Interpolator.LINEAR);
-			go.play();
-		}
+	    Actor.getTransforms().remove(Actor.getTransforms().size()-1);
+	    Actor.getTransforms().add(new Rotate(180, Rotate.Y_AXIS));
+	    
+	    var go = new TranslateTransition(new Duration(100), Actor);
+	    go.setByY(10);
+	    go.setInterpolator(Interpolator.LINEAR);
+	    go.play();
 	}
 	public static void goLeft (){ 
-		if (NotCollides(-10, 0)&canGo) 
-		for (var part : Actor){
-			part.getTransforms().remove(part.getTransforms().size()-1);
-			part.getTransforms().add(new Rotate(270, Rotate.Y_AXIS));
-			
-			var go = new TranslateTransition(new Duration(100), part);
-			go.setByX(-10);
-			go.setInterpolator(Interpolator.LINEAR);
-			go.play();
-		}
+		if (NotCollides(-10, 0)&canGo)
+	    Actor.getTransforms().remove(Actor.getTransforms().size()-1);
+	    Actor.getTransforms().add(new Rotate(270, Rotate.Y_AXIS));
+	    
+	    var go = new TranslateTransition(new Duration(100), Actor);
+	    go.setByX(-10);
+	    go.setInterpolator(Interpolator.LINEAR);
+		go.play();
 	}
 	public static void goRight(){
 		if (NotCollides(10, 0)&canGo)
-		for (var part : Actor) {
-			part.getTransforms().remove(part.getTransforms().size()-1);
-			part.getTransforms().add(new Rotate(90, Rotate.Y_AXIS));
-			var go = new TranslateTransition(new Duration(100), part);
-			go.setByX(10);
-			go.setInterpolator(Interpolator.LINEAR);
-			go.play();
-		}
+		Actor.getTransforms().remove(Actor.getTransforms().size()-1);
+		Actor.getTransforms().add(new Rotate(90, Rotate.Y_AXIS));
+		var go = new TranslateTransition(new Duration(100), Actor);
+		go.setByX(10);
+		go.setInterpolator(Interpolator.LINEAR);
+		go.play();
 	}
 	
 	public static boolean NotCollides(int x, int y) {
@@ -105,93 +93,76 @@ public class Actor {
 		for (var wall : Apartment.wall) 
 			if (aura.getBoundsInParent().intersects(wall.getBoundsInParent())) 
 				result = false;
-		for (var sofaPart : Apartment.actionstuff.get(0)) 
-			if (aura.getBoundsInParent().intersects(sofaPart.getBoundsInParent())) 
-				watchTV();
-		for (var bedPart : Apartment.actionstuff.get(2)) 
-			if (aura.getBoundsInParent().intersects(bedPart.getBoundsInParent())) 
-				sleep();
-		if (aura.getBoundsInParent().intersects(Apartment.actionstuff.get(3)[0].getBoundsInParent())) 
-	     		eat();
+		if (aura.getBoundsInParent().intersects(((Node) Apartment.actionstuff.get(0)).getBoundsInParent())) 
+			watchTV();
+		if (aura.getBoundsInParent().intersects(((Node) Apartment.actionstuff.get(2)).getBoundsInParent())) 
+			sleep();
+		if (aura.getBoundsInParent().intersects(Apartment.actionstuff.get(3).getBoundsInParent())) 
+	    	eat();
 		aura.getTransforms().remove(aura.getTransforms().size()-1);
 		return result;
 	}
 	//actions
-	private static Node[] actorSitting = createActor("watchTV man");
-	public static Node[] getWatchingTV() {
-		for (var node : actorSitting) {
-			node.setVisible(false);
-		    node.setTranslateX(-150);
-		    node.setTranslateY(200);
-		}
+	private static Group actorSitting = createActor("watchTV man");
+	public static Group getWatchingTV() {
+		actorSitting.setVisible(false);
+		actorSitting.setTranslateX(-150);
+		actorSitting.setTranslateY(200);
 		return actorSitting;
 	}
 	private static void watchTV() {
 		canGo=false;
-		for (var node : Actor) 
-			node.setVisible(false);
-		for (var node : actorSitting) 
-			node.setVisible(true);
-		Apartment.actionstuff.get(1)[0].setVisible(true);
+		Actor.setVisible(false);
+		actorSitting.setVisible(true);
+		Apartment.actionstuff.get(1).setVisible(true);
 		new MediaPlayer(new Media(new File("files/apartment/sounds/relaxing.wav").toURI().toString())).play();
 		new Timer().schedule(new TimerTask() {
 			@Override
 			public void run() {
 				canGo=true;
-				for (var node : Actor) {
-					node.setVisible(true);
-					node.setTranslateX(-120);
-					node.setTranslateY(170);
-				}
-				for (var node : actorSitting) 
-					node.setVisible(false);
-				Apartment.actionstuff.get(1)[0].setVisible(false);
+			    Actor.setVisible(true);
+			    Actor.setTranslateX(-120);
+			    Actor.setTranslateY(170);
+				actorSitting.setVisible(false);
+				Apartment.actionstuff.get(1).setVisible(false);
 			}
 		}, 7*1000L);
 	}
 	
-	private static Node[] actorSleeping = createActor("sleep man");
-	public static Node[] getSleeping() {
-		for (var node : actorSleeping) {
-			node.setVisible(false);
-		    node.getTransforms().addAll(new Translate(-360, -70, 15), new Rotate(-90, Rotate.Y_AXIS), new Scale(.9,.9,.9));
-		}
+	private static Group actorSleeping = createActor("sleep man");
+	public static Group getSleeping() {
+		actorSleeping.setVisible(false);
+		actorSleeping.getTransforms().addAll
+		(new Translate(-360, -70, 15), new Rotate(-90, Rotate.Y_AXIS), new Scale(.9,.9,.9));
 		return actorSleeping;
 	}
 	private static void sleep () {
 		canGo=false;
-		for (var node : Actor) 
-			node.setVisible(false);
-		for (var node : actorSleeping) 
-			node.setVisible(true);
+		Actor.setVisible(false);
+		actorSleeping.setVisible(true);
 		new MediaPlayer(new Media(new File("files/apartment/sounds/sleeping.wav").toURI().toString())).play();
 		new Timer().schedule(new TimerTask() {
 			@Override
 			public void run() {
 				canGo=true;
-				for (var node : Actor) {
-					node.setVisible(true);
-					node.setTranslateX(70);
-				}
-				for (var node : actorSleeping) 
-					node.setVisible(false);
+				Actor.setVisible(true);
+				Actor.setTranslateX(70);
+				actorSleeping.setVisible(false);
 			}
 		}, 10*1000L);
 	}
 
 	private static void eat() {
 		canGo=false;
-		Apartment.actionstuff.get(3)[0].setVisible(true);
+		Apartment.actionstuff.get(3).setVisible(true);
 		new MediaPlayer(new Media(new File("files/apartment/sounds/eating.wav").toURI().toString())).play();
 		new Timer().schedule(new TimerTask() {
 			@Override
 			public void run() {
 				canGo=true;
-				for (var node : Actor) {
-					node.setTranslateX(-30);
-					node.setTranslateY(-160);
-				}
-				Apartment.actionstuff.get(3)[0].setVisible(false);
+			    Actor.setTranslateX(-30);
+			    Actor.setTranslateY(-160);
+				Apartment.actionstuff.get(3).setVisible(false);
 			}
 		}, 5*1000L);
 	}

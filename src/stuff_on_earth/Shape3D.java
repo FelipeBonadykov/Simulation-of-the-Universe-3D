@@ -4,11 +4,11 @@ import com.interactivemesh.jfx.importer.ModelImporter;
 import com.interactivemesh.jfx.importer.obj.ObjModelImporter;
 import com.interactivemesh.jfx.importer.tds.TdsModelImporter;
 
+import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.shape.Shape3D;
 
 final class Shape3dConstructor {
-	static Node[] getShape3D(String name, String extension) {
+	static Group getShape3D(String name, String extension) {
 		ModelImporter modelImporter;
 		switch (extension) {
 		case "obj":
@@ -20,15 +20,15 @@ final class Shape3dConstructor {
 		default:
 			throw new RuntimeException("You have used an unsupported type");
 		}
-		Node[] mesh=null;
+		Group model = null;
 		try {
 			modelImporter.read("files/3d/"+name+"/"+name+"."+extension);//directory of object in relation to the project
-			mesh = (Node[]) modelImporter.getImport();
+			model = new Group((Node[]) modelImporter.getImport());
 			modelImporter.close();
 		} catch (Exception e) {
-			System.err.println(" FILE NOT FUND  "+e.getMessage());
+			System.err.println(" FILE NOT FOUND  "+e.getMessage());
 		}
-		return mesh;
+		return model;
 	}
 	private Shape3dConstructor(){}
 }
