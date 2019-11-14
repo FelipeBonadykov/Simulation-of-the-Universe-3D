@@ -23,12 +23,14 @@ public class Actor {
 	private static Group Actor = createActor("man");
 	private static boolean canGo=true;
 	private static Box aura = new Box(30,30, 100);
-	static {
-		 aura.translateXProperty().bind(Actor.translateXProperty());
-		 aura.translateYProperty().bind(Actor.translateYProperty());
+	static { // adjustments
+		Actor.getTransforms().addAll(new Rotate());
+		aura.setTranslateX(-30);
+		Actor.translateXProperty().bind(aura.translateXProperty());
+		Actor.translateYProperty().bind(aura.translateYProperty());
 	 }
 	private static Group createActor(String person) {
-		ModelImporter modelImporter = new ObjModelImporter();
+		var modelImporter = new ObjModelImporter();
 		Group mesh=null;
 		try {
 			modelImporter.read("files/apartment/3d models/0 PEOPLE/"+person+"/"+person+".obj");
@@ -38,8 +40,7 @@ public class Actor {
 			System.err.println(" FILE NOT FOUND  "+e.getMessage());
 		}
 	    mesh.getTransforms().addAll
-	    (new Rotate(90, Rotate.X_AXIS), new Scale(.6,.6,.6), new Rotate(180, Rotate.Y_AXIS), new Rotate());
-		mesh.setTranslateX(-30);
+	    (new Rotate(90, Rotate.X_AXIS), new Scale(.6,.6,.6), new Rotate(180, Rotate.Y_AXIS));
 		return mesh;
 	}
 	
@@ -48,48 +49,53 @@ public class Actor {
 	}
 	//movements
 	public static void goAhead(){
-		if (NotCollides(0, -10)&canGo) 
-	    Actor.getTransforms().remove(Actor.getTransforms().size()-1);
-	    Actor.getTransforms().add(new Rotate(0, Rotate.Y_AXIS));
-        
-	    var go = new TranslateTransition(new Duration(100), Actor);
-	    go.setByY(-10);
-	    go.setInterpolator(Interpolator.LINEAR);
-	    go.play();
+		if (NotCollides(0, -10)&canGo) {
+			Actor.getTransforms().remove(Actor.getTransforms().size()-1);
+			Actor.getTransforms().add(new Rotate(0, Rotate.Y_AXIS));
+			
+			var go = new TranslateTransition(new Duration(100), aura);
+			go.setByY(-10);
+			go.setInterpolator(Interpolator.LINEAR);
+			go.play();
+		} 
 	}
 	public static void goBack (){
-		if (NotCollides(0, 10)&canGo) 
-	    Actor.getTransforms().remove(Actor.getTransforms().size()-1);
-	    Actor.getTransforms().add(new Rotate(180, Rotate.Y_AXIS));
-	    
-	    var go = new TranslateTransition(new Duration(100), Actor);
-	    go.setByY(10);
-	    go.setInterpolator(Interpolator.LINEAR);
-	    go.play();
+		if (NotCollides(0, 10)&canGo) {
+	        Actor.getTransforms().remove(Actor.getTransforms().size()-1);
+	        Actor.getTransforms().add(new Rotate(180, Rotate.Y_AXIS));
+	        
+	        var go = new TranslateTransition(new Duration(100), aura);
+	        go.setByY(10);
+	        go.setInterpolator(Interpolator.LINEAR);
+	        go.play();
+		}
 	}
 	public static void goLeft (){ 
-		if (NotCollides(-10, 0)&canGo)
-	    Actor.getTransforms().remove(Actor.getTransforms().size()-1);
-	    Actor.getTransforms().add(new Rotate(270, Rotate.Y_AXIS));
-	    
-	    var go = new TranslateTransition(new Duration(100), Actor);
-	    go.setByX(-10);
-	    go.setInterpolator(Interpolator.LINEAR);
-		go.play();
+		if (NotCollides(-10, 0)&canGo) {
+	        Actor.getTransforms().remove(Actor.getTransforms().size()-1);
+	        Actor.getTransforms().add(new Rotate(270, Rotate.Y_AXIS));
+	        
+	        var go = new TranslateTransition(new Duration(100), aura);
+	        go.setByX(-10);
+	        go.setInterpolator(Interpolator.LINEAR);
+		    go.play();
+		}
 	}
 	public static void goRight(){
-		if (NotCollides(10, 0)&canGo)
-		Actor.getTransforms().remove(Actor.getTransforms().size()-1);
-		Actor.getTransforms().add(new Rotate(90, Rotate.Y_AXIS));
-		var go = new TranslateTransition(new Duration(100), Actor);
-		go.setByX(10);
-		go.setInterpolator(Interpolator.LINEAR);
-		go.play();
+		if (NotCollides(10, 0)&canGo) {
+			Actor.getTransforms().remove(Actor.getTransforms().size()-1);
+		    Actor.getTransforms().add(new Rotate(90, Rotate.Y_AXIS));
+		    
+		    var go = new TranslateTransition(new Duration(100), aura);
+		    go.setByX(10);
+		    go.setInterpolator(Interpolator.LINEAR);
+		    go.play();
+		}
 	}
 	
 	public static boolean NotCollides(int x, int y) {
 		var result = true;
-		aura.getTransforms().add(new Translate(x,0,y));
+		aura.getTransforms().add(new Translate(x,y,0));
 		for (var wall : Apartment.wall) 
 			if (aura.getBoundsInParent().intersects(wall.getBoundsInParent())) 
 				result = false;
@@ -121,8 +127,8 @@ public class Actor {
 			public void run() {
 				canGo=true;
 			    Actor.setVisible(true);
-			    Actor.setTranslateX(-120);
-			    Actor.setTranslateY(170);
+			    aura.setTranslateX(-120);
+			    aura.setTranslateY(170);
 				actorSitting.setVisible(false);
 				Apartment.actionstuff.get(1).setVisible(false);
 			}
@@ -133,7 +139,7 @@ public class Actor {
 	public static Group getSleeping() {
 		actorSleeping.setVisible(false);
 		actorSleeping.getTransforms().addAll
-		(new Translate(-360, -70, 15), new Rotate(-90, Rotate.Y_AXIS), new Scale(.9,.9,.9));
+		(new Translate(-330, -70, 15), new Rotate(-90, Rotate.Y_AXIS), new Scale(.9,.9,.9));
 		return actorSleeping;
 	}
 	private static void sleep () {
@@ -146,7 +152,7 @@ public class Actor {
 			public void run() {
 				canGo=true;
 				Actor.setVisible(true);
-				Actor.setTranslateX(70);
+				aura.setTranslateX(70);
 				actorSleeping.setVisible(false);
 			}
 		}, 10*1000L);
@@ -160,8 +166,8 @@ public class Actor {
 			@Override
 			public void run() {
 				canGo=true;
-			    Actor.setTranslateX(-30);
-			    Actor.setTranslateY(-160);
+			    aura.setTranslateX(-30);
+			    aura.setTranslateY(-160);
 				Apartment.actionstuff.get(3).setVisible(false);
 			}
 		}, 5*1000L);
