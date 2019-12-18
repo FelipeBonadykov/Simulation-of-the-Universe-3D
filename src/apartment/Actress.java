@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import com.interactivemesh.jfx.importer.ModelImporter;
 import com.interactivemesh.jfx.importer.tds.TdsModelImporter;
 
 import javafx.animation.Animation;
@@ -22,37 +21,37 @@ import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
 import javafx.scene.transform.Translate;
 import javafx.util.Duration;
+import space.MainSpace;
 
 public class Actress {
 	private static Group girl;
 	private static Box aura = new Box(30,30, 100);
-	private static Pane girlPane = new Pane();
+	private static Pane girlPane = new Pane(createActress());
 	private static PathTransition moves = new PathTransition();
 	private static boolean canGo=true;
+
 	static {
-		setAngleRotate(0);
-		move();
-		girl = createActress();
-		girlPane.getChildren().addAll(girl);
 		girlPane.translateXProperty().bind(aura.translateXProperty());
     	girlPane.translateYProperty().bind(aura.translateYProperty());
+    	girlPane.getTransforms().add(new Rotate(0));
+		move();
 	}
+	
 	public static Pane getActress() {
 		return girlPane;
 	}
+	
 	private static Group createActress() {
-		ModelImporter modelImporter = new TdsModelImporter();
-	    String direction = "files/apartment/3d models/0 PEOPLE/girl/girl.3ds";
-	    Group mesh=null;
+		var modelImporter = new TdsModelImporter();
 	    try {
-	    	modelImporter.read(direction);//directory of object in relation to the project
-	    	mesh = new Group((Node[]) modelImporter.getImport());
+	    	modelImporter.read("files/apartment/3d models/0 PEOPLE/girl/girl.3ds");
+	    	girl = new Group((Node[]) modelImporter.getImport());
 	    	modelImporter.close();
 	    } catch (Exception e) {
 	    	System.err.println(e.getCause() +"  "+ e.getMessage());
 	    }
-        mesh.getTransforms().addAll(new Rotate(90, Rotate.X_AXIS), new Scale(1.7,1.7,1.7));
-	    return mesh;
+        girl.getTransforms().addAll(new Rotate(90, Rotate.X_AXIS), new Scale(1.7,1.7,1.7));
+        return girl;
 	}
 	//artificial intelligence
 	private static Polyline getPath() {
@@ -75,6 +74,7 @@ public class Actress {
 		});
 		return path;
 	}
+	
 	private static void move() {
 		moves.setDuration(new Duration(360_00));
 		moves.setPath(getPath());
@@ -88,39 +88,42 @@ public class Actress {
 				if (canGo) {
 					var time = Math.round(moves.getCurrentTime().toSeconds());
 					if (time==3)  eat();
-					if (time==5)  setAngleRotate(-90);
-					if (time==7)  setAngleRotate(-90);
-					if (time==10) setAngleRotate( 90);
-					if (time==11) setAngleRotate( 30);
-					if (time==12) setAngleRotate(-30);
+					if (time==4)  setAngleRotate(90);
+					if (time==7)  setAngleRotate(270);
+					if (time==10) setAngleRotate(0);
+					if (time==11) setAngleRotate(30);
+					if (time==12) setAngleRotate(0);
 					if (time==14) setAngleRotate(180);
 					if (time==15) watchTV();
-					if (time==17) setAngleRotate( 30);
-					if (time==18) setAngleRotate( 60);
-					if (time==20) girlPane.getTransforms().addAll(new Rotate(90, Rotate.X_AXIS), new Translate(0,-70,0));
+					if (time==16) setAngleRotate(210);
+					if (time==17) setAngleRotate(270);
+					if (time==20) girlPane.getTransforms().addAll(new Translate(0,15,-45), new Rotate(90, Rotate.X_AXIS));
 					if (time==21) sleep();
-					if (time==22) setAngleRotate(210);
-					if (time==23) setAngleRotate( 60);
-					if (time==24) setAngleRotate( 90);
-					if (time==26) setAngleRotate(180);
+					if (time==22) setAngleRotate(120);
+					if (time==23) setAngleRotate(180);
+					if (time==24) setAngleRotate(270);
+					if (time==26) setAngleRotate(90);
 					if (time==27) takeShower();
-					if (time==29) setAngleRotate(-90);
-					if (time==31) setAngleRotate(-30);
-					if (time==33) setAngleRotate( 60);
-					if (time==35) setAngleRotate(150);
+					if (time==29) setAngleRotate(0);
+					if (time==31) setAngleRotate(330);
+					if (time==33) setAngleRotate(30);
+					if (time==35) setAngleRotate(180);
 				}
 			}
 		}, 0,1000);
 	}	
 	//actions
 	private static void setAngleRotate(int angle) {
+		girlPane.getTransforms().remove(girlPane.getTransforms().size()-1);
 		girlPane.getTransforms().add(new Rotate(angle, Rotate.Z_AXIS));
 	}
+	
 	private static void eat() {
 		canGo=false;
 		moves.pause();
 		Apartment.actionstuff.get(3).setVisible(true);
-		new MediaPlayer(new Media(new File("files/apartment/sounds/eating.wav").toURI().toString())).play();
+		if (MainSpace.isPpressed)
+			new MediaPlayer(new Media(new File("files/apartment/sounds/eating.wav").toURI().toString())).play();
 		new Timer().schedule(new TimerTask() {
 			@Override
 			public void run() {
@@ -135,7 +138,8 @@ public class Actress {
 		canGo=false;
 		moves.pause();
 		Apartment.actionstuff.get(1).setVisible(true);
-		new MediaPlayer(new Media(new File("files/apartment/sounds/relaxing.wav").toURI().toString())).play();
+		if (MainSpace.isPpressed)
+			new MediaPlayer(new Media(new File("files/apartment/sounds/relaxing.wav").toURI().toString())).play();
 		new Timer().schedule(new TimerTask() {
 			@Override
 			public void run() {
@@ -148,12 +152,14 @@ public class Actress {
 	private static void sleep() {
 		canGo=false;
 		moves.pause();
-		new MediaPlayer(new Media(new File("files/apartment/sounds/sleeping.wav").toURI().toString())).play();
+		if (MainSpace.isPpressed)
+			new MediaPlayer(new Media(new File("files/apartment/sounds/sleeping.wav").toURI().toString())).play();
 		new Timer().schedule(new TimerTask() {
 			@Override
 			public void run() {
 				canGo=true;
-				girlPane.getTransforms().add(new Rotate(-90, Rotate.X_AXIS));
+				girlPane.getTransforms().remove(girlPane.getTransforms().size()-1);
+				girlPane.getTransforms().remove(girlPane.getTransforms().size()-1);
 				moves.play();
 			}
 		}, 10*1000L);
@@ -165,7 +171,8 @@ public class Actress {
 		girl.getChildren().get(1).setVisible(false);
 		girl.getChildren().get(2).setVisible(false);
 		girl.getChildren().get(4).setVisible(false);
-		new MediaPlayer(new Media(new File("files/apartment/sounds/taking-shower.wav").toURI().toString())).play();
+		if (MainSpace.isPpressed)
+			new MediaPlayer(new Media(new File("files/apartment/sounds/taking-shower.wav").toURI().toString())).play();
 		new Timer().schedule(new TimerTask() {
 			@Override
 			public void run() {
@@ -178,4 +185,5 @@ public class Actress {
 			}
 		}, 3*1000L);
 	}
+
 }
